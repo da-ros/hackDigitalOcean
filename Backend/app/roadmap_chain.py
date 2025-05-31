@@ -12,10 +12,10 @@ llm = ChatOpenAI(
     openai_api_key=os.getenv("OPENAI_API_KEY")
 )
 
-messages = [HumanMessage(content="Hello from GPT-4 mini!")]
+# messages = [HumanMessage(content="Hello from GPT-4 mini!")]
 
-response = llm(messages)
-print(response.content)
+# response = llm(messages)
+# print(response.content)
 
 def generate_roadmap(current_career, future_goal, resume_text):
     # Step 1: Extract resume summary
@@ -30,6 +30,7 @@ def generate_roadmap(current_career, future_goal, resume_text):
         "Current Career: {current_career}\nResume Summary: {resume_summary}\nFuture Goal: {future_goal}\n\n"
         "Provide a career roadmap: key gaps, skills needed, and step-by-step transition plan with realistic timelines."
     )
+    
     roadmap_chain = LLMChain(llm=llm, prompt=roadmap_prompt)
     roadmap = roadmap_chain.run(
         current_career=current_career,
