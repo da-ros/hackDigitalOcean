@@ -1,7 +1,9 @@
-from fastapi import FastAPI, Form, UploadFile
-from roadmap_chain import generate_roadmap
+from fastapi import FastAPI, Form, UploadFile, HTTPException
 from resume_parser import extract_text_from_pdf
 from fastapi.middleware.cors import CORSMiddleware
+from flow_loader import load_career_roadmap_flow
+from resume_parser import extract_text_from_pdf, create_notion_page
+
 
 app = FastAPI()
 
@@ -24,12 +26,37 @@ async def roadmap_api(
     future_goal: str = Form(...),
     resume: UploadFile = Form(...)
 ):
-    resume_text = extract_text_from_pdf(resume)
-    roadmap = generate_roadmap(current_career, future_goal, resume_text)
+    if resume is None:
+        raise HTTPException(status_code=400, detail="Resume file is required.")
 
+    try:
+        resume_text = extract_text_from_pdf(resume)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read resume: {str(e)}")
+
+    # ✅ Load Langflow JSON chain
+    chain = load_career_roadmap_flow()
+
+    # 🧠 Run the chain with inputs
+    try:
+        result = chain.invoke({
+            "current_role": current_career,
+            "future_goal": future_goal,
+            "resume": resume_text
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Langflow chain error: {str(e)}")
+
+    roadmap = result if isinstance(result, str) else str(result)
+
+    if not roadmap.strip():
+        raise HTTPException(status_code=500, detail="Empty response from Langflow flow.")
+
+    # 📝 Create Notion page
     notion_url = create_notion_page(
         title=f"Career Roadmap for {current_career}",
         content=roadmap
     )
+    
 
     return {"roadmap": roadmap, "notion_url": notion_url}

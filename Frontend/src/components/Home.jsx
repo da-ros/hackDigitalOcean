@@ -60,12 +60,12 @@ export default function Home() {
                 className="block text-gray-700 font-medium mb-1"
                 htmlFor="career-goals"
               >
-                Career Goals
+                Current Career
               </label>
               <input
                 type="text"
                 id="career-goals"
-                placeholder="e.g., Become a Backend Engineer"
+                placeholder="e.g.,Backend Engineer"
                 className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={careerGoals}
                 onChange={(e) => setCareerGoals(e.target.value)}
