@@ -1,8 +1,21 @@
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
+import os
+from dotenv import load_dotenv
+from langchain.schema import HumanMessage
 
-llm = ChatOpenAI(model_name="gpt-4")
+load_dotenv()
+
+llm = ChatOpenAI(
+    model_name="gpt-4o-mini",
+    openai_api_key=os.getenv("OPENAI_API_KEY")
+)
+
+messages = [HumanMessage(content="Hello from GPT-4 mini!")]
+
+response = llm(messages)
+print(response.content)
 
 def generate_roadmap(current_career, future_goal, resume_text):
     # Step 1: Extract resume summary

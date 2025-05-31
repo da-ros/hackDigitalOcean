@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Form, UploadFile
 from roadmap_chain import generate_roadmap
 from resume_parser import extract_text_from_pdf
-
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 app.add_middleware(
