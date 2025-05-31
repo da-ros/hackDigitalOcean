@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+# langflow
 langchain
 langchain-community
 openai
@@ -8,3 +9,4 @@ pydantic
 pymupdf
 python-dotenv
 axios
+# git+https://github.com/langflow-ai/langflow.git
