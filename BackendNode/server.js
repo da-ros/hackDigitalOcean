@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require("fs").promises;
 const path = require("path");
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -50,66 +51,21 @@ app.get("/users", (req, res) => {
 
 // Main webhook endpoint for Twilio Studio
 app.post("/twilio-webhook", async (req, res) => {
+  // Extract relevant data from Twilio's request
+  const { From, Body } = req.body;
+
+  // Forward to Langflow backend
   try {
-    console.log("=== Twilio Studio Webhook Received ===");
-    console.log("Full request body:", JSON.stringify(req.body, null, 2));
-
-    // Extract user data from Twilio Studio variables
-    // These should match the variable names you set in Twilio Studio
-    const userInfo = {
-      id: Date.now().toString(), // Simple ID generation
-      name: req.body.name || req.body.user_name || req.body.UserName || "",
-      job: req.body.job || req.body.current_job || req.body.CurrentJob || "",
-      phone: req.body.From || req.body.Caller || "",
-      callSid: req.body.CallSid || "",
-      accountSid: req.body.AccountSid || "",
-      timestamp: new Date().toISOString(),
-      callStatus: req.body.CallStatus || "",
-      fromCity: req.body.FromCity || "",
-      fromState: req.body.FromState || "",
-      fromCountry: req.body.FromCountry || "",
-    };
-
-    console.log("Processed user info:", userInfo);
-
-    // Validate required fields
-    if (!userInfo.name && !userInfo.job) {
-      console.log("⚠️  No name or job data found in request");
-      // Still process the request but log the issue
-    }
-
-    // Store user data
-    if (userInfo.name || userInfo.job) {
-      userData.push(userInfo);
-      console.log(`✅ User data stored. Total users: ${userData.length}`);
-
-      // Optional: Save to file for persistence
-      await saveUserDataToFile(userInfo);
-    }
-
-    // Send success response back to Twilio Studio
-    res.json({
-      success: true,
-      message: "User data received and processed successfully",
-      data: {
-        name: userInfo.name,
-        job: userInfo.job,
-        phone: userInfo.phone,
-        timestamp: userInfo.timestamp,
-      },
+    const response = await axios.post('http://langflow:7860/generate-roadmap', {
+      from: From,
+      message: Body,
     });
 
-    // Log successful processing
-    console.log(
-      `✅ Successfully processed data for: ${userInfo.name || "Unknown"}`
-    );
+    // Respond to Twilio (e.g., with TwiML or a simple message)
+    res.set('Content-Type', 'text/xml');
+    res.send(`<Response><Message>${response.data.reply}</Message></Response>`);
   } catch (error) {
-    console.error("❌ Error processing Twilio webhook:", error);
-    res.status(500).json({
-      success: false,
-      error: "Internal server error",
-      message: error.message,
-    });
+    res.status(500).send('Error forwarding to Langflow');
   }
 });
 

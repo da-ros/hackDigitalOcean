@@ -24,6 +24,18 @@ services:
       - "5432:5432"
     volumes:
       - langflow-postgres:/var/lib/postgresql/data
+
+  node-twilio:
+    build:
+      context: ./BackendNode
+      dockerfile: Dockerfile
+    container_name: backend-node
+    ports:
+      - "3000:3000"
+    # environment:
+      # Add your environment variables here, for example:
+      # NODE_ENV: production
+    restart: unless-stopped
     
 
 volumes:
