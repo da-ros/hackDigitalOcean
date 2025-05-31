@@ -26,15 +26,6 @@ services:
       - langflow-postgres:/var/lib/postgresql/data
     
 
-  ambassador-nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    
-      
-
 volumes:
   langflow-postgres:
   langflow-data:
