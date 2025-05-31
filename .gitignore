@@ -1,0 +1,33 @@
+# macOS system files
+.DS_Store
+
+# Node modules
+node_modules/
+
+# Vite build output
+dist/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.*.local
+
+# VSCode settings
+.vscode/
+
+# IDE files
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS junk files
+Thumbs.db
+Desktop.ini
+
+# Local history
+.history/
